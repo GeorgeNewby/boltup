@@ -12,8 +12,10 @@ var (
 	key    = []byte("version")
 )
 
+// Migration represents a single bolt migration to updates the db by one version
 type Migration func(tx *LimitedTx) error
 
+// Up excutes all the migrations as one transaction, if a migration fails the transaction is rolled back
 func Up(db *bolt.DB, migrations ...Migration) error {
 	tx, err := db.Begin(true)
 	if err != nil {
