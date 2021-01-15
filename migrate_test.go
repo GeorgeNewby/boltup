@@ -23,7 +23,7 @@ func TestUp_SingleMigration(t *testing.T) {
 	db, cleanup := newDB(t)
 	defer cleanup()
 
-	createTestBucket := func(tx *bolt.Tx) error {
+	createTestBucket := func(tx *LimitedTx) error {
 		_, err := tx.CreateBucket([]byte("test"))
 		return err
 	}
@@ -37,17 +37,17 @@ func TestUp_MultipleMigrations(t *testing.T) {
 	db, cleanup := newDB(t)
 	defer cleanup()
 
-	createTestBucket := func(tx *bolt.Tx) error {
+	createTestBucket := func(tx *LimitedTx) error {
 		_, err := tx.CreateBucket([]byte("test"))
 		return err
 	}
 
-	updateValueToOne := func(tx *bolt.Tx) error {
+	updateValueToOne := func(tx *LimitedTx) error {
 		b := tx.Bucket([]byte("test"))
 		return b.Put([]byte("value"), []byte("1"))
 	}
 
-	updateValueToTwo := func(tx *bolt.Tx) error {
+	updateValueToTwo := func(tx *LimitedTx) error {
 		b := tx.Bucket([]byte("test"))
 		return b.Put([]byte("value"), []byte("2"))
 	}
@@ -61,12 +61,12 @@ func TestUp_FailedMigration(t *testing.T) {
 	db, cleanup := newDB(t)
 	defer cleanup()
 
-	createTestBucket := func(tx *bolt.Tx) error {
+	createTestBucket := func(tx *LimitedTx) error {
 		_, err := tx.CreateBucket([]byte("test"))
 		return err
 	}
 
-	failedMigration := func(tx *bolt.Tx) error {
+	failedMigration := func(tx *LimitedTx) error {
 		return errors.New("Something went wrong")
 	}
 
@@ -79,12 +79,12 @@ func TestUp_ExistingMigrations(t *testing.T) {
 	db, cleanup := newDB(t)
 	defer cleanup()
 
-	createTestBucket := func(tx *bolt.Tx) error {
+	createTestBucket := func(tx *LimitedTx) error {
 		_, err := tx.CreateBucket([]byte("test"))
 		return err
 	}
 
-	updateValueToOne := func(tx *bolt.Tx) error {
+	updateValueToOne := func(tx *LimitedTx) error {
 		b := tx.Bucket([]byte("test"))
 		return b.Put([]byte("value"), []byte("1"))
 	}
@@ -99,12 +99,12 @@ func TestUp_ExistingMigrations_FailedMigration(t *testing.T) {
 	db, cleanup := newDB(t)
 	defer cleanup()
 
-	createTestBucket := func(tx *bolt.Tx) error {
+	createTestBucket := func(tx *LimitedTx) error {
 		_, err := tx.CreateBucket([]byte("test"))
 		return err
 	}
 
-	failedMigration := func(tx *bolt.Tx) error {
+	failedMigration := func(tx *LimitedTx) error {
 		return errors.New("Something went wrong")
 	}
 
@@ -118,17 +118,17 @@ func TestUp_ExistingMigrations_BadVersion(t *testing.T) {
 	db, cleanup := newDB(t)
 	defer cleanup()
 
-	createTestBucket := func(tx *bolt.Tx) error {
+	createTestBucket := func(tx *LimitedTx) error {
 		_, err := tx.CreateBucket([]byte("test"))
 		return err
 	}
 
-	updateValueToOne := func(tx *bolt.Tx) error {
+	updateValueToOne := func(tx *LimitedTx) error {
 		b := tx.Bucket([]byte("test"))
 		return b.Put([]byte("value"), []byte("1"))
 	}
 
-	badMigration := func(tx *bolt.Tx) error {
+	badMigration := func(tx *LimitedTx) error {
 		_, err := tx.CreateBucket([]byte("bad"))
 		return err
 	}

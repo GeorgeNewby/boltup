@@ -12,7 +12,7 @@ var (
 	key    = []byte("version")
 )
 
-type Migration func(tx *bolt.Tx) error
+type Migration func(tx *LimitedTx) error
 
 func Up(db *bolt.DB, migrations ...Migration) error {
 	tx, err := db.Begin(true)
@@ -36,7 +36,8 @@ func Up(db *bolt.DB, migrations ...Migration) error {
 	}
 
 	for i := dbVersion; i < libVersion; i++ {
-		if err := migrations[i](tx); err != nil {
+		limitedTx := &LimitedTx{tx}
+		if err := migrations[i](limitedTx); err != nil {
 			return errorf("failed to migrate from version %d to %d: %w", i, i+1, err)
 		}
 	}
